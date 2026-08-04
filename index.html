@@ -248,21 +248,23 @@
     // ==============================================
     var map = L.map('map').setView([26.5, 118.5], 8);
 
-    // ---- 底图：高德地图中文注记 ----
+    // ---- 底图：高德地图中文注记（缩放限制：最大 12 级，仅显示简单路网） ----
     var amapLayer = L.tileLayer(
       'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
       {
         subdomains: '1234',
         maxZoom: 18,
+        maxNativeZoom: 12,
         attribution: '&copy; 高德地图',
       }
     );
 
-    // ---- 备用底图：OpenStreetMap ----
+    // ---- 备用底图：OpenStreetMap（同步限制） ----
     var osmLayer = L.tileLayer(
       'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       {
         maxZoom: 19,
+        maxNativeZoom: 12,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 贡献者',
       }
     );
