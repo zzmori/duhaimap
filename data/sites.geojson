@@ -1,0 +1,195 @@
+﻿{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [119.6525, 29.0916] },
+      "properties": {
+        "name": "台湾义勇队旧址",
+        "level": "A",
+        "address": "浙江省金华市婺城区酒坊巷84号",
+        "type": "抗战遗址",
+        "year": "1939",
+        "people": "李友邦",
+        "protect": "全国重点文物保护单位",
+        "edu": "国家级抗战纪念设施",
+        "status": "保存完好，已辟为纪念馆",
+        "blurb": "1939年2月，台湾爱国志士李友邦在金华组建台湾义勇队，以「保卫祖国，收复台湾」为宗旨，是抗战时期台湾同胞在大陆组建的最具影响力的抗日团体。",
+        "photo_now": "yi-yong-dui-now.jpg",
+        "photo_hist": "yi-yong-dui-hist.jpg",
+        "timeline": "1939年｜台湾义勇队在金华酒坊巷成立｜李友邦任队长｜1942年｜浙赣战役中开展战地救护｜1945年｜抗战胜利后返回台湾"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [119.6448, 29.1028] },
+      "properties": {
+        "name": "台湾少年团旧址",
+        "level": "A",
+        "address": "浙江省金华市婺城区旌孝街",
+        "type": "抗战遗址",
+        "year": "1939",
+        "people": "李友邦、台湾少年团团员",
+        "protect": "省级文物保护单位",
+        "edu": "省级爱国主义教育基地",
+        "status": "建筑尚存，需进一步修缮",
+        "blurb": "台湾少年团是台湾义勇队下属的少年儿童抗日宣传团体，由流亡大陆的台湾籍少年儿童组成，以歌咏、戏剧等形式在东南沿海开展抗日救亡宣传。",
+        "photo_now": "shao-nian-tuan-now.jpg",
+        "photo_hist": "shao-nian-tuan-hist.jpg",
+        "timeline": "1939年｜台湾少年团在金华成立｜1941年｜赴闽浙赣各地巡回宣传｜1943年｜团员发展至百余人｜1945年｜随义勇队返回台湾"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [118.0894, 24.4798] },
+      "properties": {
+        "name": "厦门台湾公会旧址",
+        "level": "B",
+        "address": "福建省厦门市思明区鹭江道",
+        "type": "涉台遗址",
+        "year": "1937",
+        "people": "台湾抗日志士",
+        "protect": "市级文物保护单位",
+        "edu": "市级爱国主义教育基地",
+        "status": "部分保留，已立碑标示",
+        "blurb": "厦门台湾公会是抗战前及抗战初期在厦台湾同胞的重要组织，七七事变后许多台胞经此投身祖国抗战，是连接两岸同胞共同抗日的重要历史见证。",
+        "photo_now": "taiwan-gonghui-now.jpg",
+        "photo_hist": "taiwan-gonghui-hist.jpg",
+        "timeline": "1937年｜七七事变后组织台胞撤离｜1938年｜厦门沦陷前开展救亡｜1945年｜抗战胜利后复会"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [119.6721, 29.1135] },
+      "properties": {
+        "name": "金华山抗战遗址群",
+        "level": "B",
+        "address": "浙江省金华市金华山",
+        "type": "抗战遗址",
+        "year": "1942",
+        "people": "浙东游击纵队",
+        "protect": "省级文物保护单位",
+        "edu": "省级爱国主义教育基地",
+        "status": "部分遗址保存完好",
+        "blurb": "金华山是浙赣战役的重要战场，山中有多处抗战时期留下的战壕、指挥所等遗址，见证了浙东军民浴血奋战的历史。",
+        "photo_now": "jinhuashan-now.jpg",
+        "photo_hist": "jinhuashan-hist.jpg",
+        "timeline": "1942年｜浙赣战役爆发｜金华山阻击战打响｜1943年｜游击区建立｜1945年｜迎来抗战胜利"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [118.1025, 24.4528] },
+      "properties": {
+        "name": "鼓浪屿抗日遗址",
+        "level": "B",
+        "address": "福建省厦门市思明区鼓浪屿",
+        "type": "抗战遗址",
+        "year": "1938",
+        "people": "厦门各界抗日团体",
+        "protect": "世界文化遗产地",
+        "edu": "国家级爱国主义教育基地",
+        "status": "保存完好",
+        "blurb": "鼓浪屿在抗战期间曾是许多抗日团体和爱国人士的活动据点，岛上的多处建筑见证了那段烽火岁月。",
+        "photo_now": "gulangyu-now.jpg",
+        "photo_hist": "gulangyu-hist.jpg",
+        "timeline": "1938年｜厦门沦陷｜鼓浪屿成抗日据点｜1941年｜情报联络站建立｜1945年｜抗战胜利"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [119.6352, 29.0761] },
+      "properties": {
+        "name": "金华抗日阵亡将士纪念碑",
+        "level": "C",
+        "address": "浙江省金华市婺城区人民广场",
+        "type": "纪念设施",
+        "year": "1946",
+        "people": "金华军民",
+        "protect": "市级文物保护单位",
+        "edu": "市级爱国主义教育基地",
+        "status": "保存完好，每年清明举行祭扫",
+        "blurb": "为纪念在抗日战争中牺牲的金华籍将士及在金华地区牺牲的抗日英烈而建，是金华重要的抗战纪念设施。",
+        "photo_now": "jinianbei-now.jpg",
+        "photo_hist": "jinianbei-hist.jpg",
+        "timeline": "1946年｜纪念碑落成｜1949年后｜多次修缮｜2015年｜列入抗战纪念设施名录"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [118.0712, 24.4683] },
+      "properties": {
+        "name": "厦门五通灯塔抗日遗址",
+        "level": "C",
+        "address": "福建省厦门市湖里区五通码头",
+        "type": "抗战遗址",
+        "year": "1938",
+        "people": "厦门守军",
+        "protect": "市级文物保护单位",
+        "edu": "区级爱国主义教育基地",
+        "status": "遗址尚存，周边环境已变化",
+        "blurb": "五通灯塔一带是1938年5月日军登陆厦门的主要地点之一，中国守军在此进行了顽强抵抗，书写了厦门抗战史上的悲壮一页。",
+        "photo_now": "wutong-now.jpg",
+        "photo_hist": "wutong-hist.jpg",
+        "timeline": "1938年5月10日｜日军在五通登陆｜守军浴血抵抗｜5月13日｜厦门沦陷｜1945年｜光复"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [119.6588, 29.0872] },
+      "properties": {
+        "name": "金华台湾医院旧址",
+        "level": "C",
+        "address": "浙江省金华市婺城区",
+        "type": "涉台遗址",
+        "year": "1939",
+        "people": "台湾义勇队医疗队",
+        "protect": "市级文物保护单位",
+        "edu": "未定级",
+        "status": "建筑已改建，仅存碑记",
+        "blurb": "台湾义勇队附设的台湾医院，由台籍医师主持，不仅为队员提供医疗服务，还积极为金华当地百姓义诊，是两岸同胞患难与共的生动体现。",
+        "photo_now": "taiwan-yiyuan-now.jpg",
+        "photo_hist": "taiwan-yiyuan-hist.jpg",
+        "timeline": "1939年｜台湾医院成立｜1942年｜浙赣战役中紧急救治伤员｜1943年｜随义勇队转移福建"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [118.049, 24.606] },
+      "properties": {
+        "name": "集美兑山李友邦将军纪念馆",
+        "level": "C",
+        "address": "厦门市集美区后溪镇兑山村",
+        "type": "纪念场馆",
+        "year": "",
+        "people": "李友邦、陈云林",
+        "protect": "未定级",
+        "edu": "",
+        "status": "纪念馆已建成开放",
+        "blurb": "李友邦将军祖籍地为同安兑山（今集美兑山村），纪念馆展示李友邦将军事迹，陈云林题词。",
+        "photo_now": "xm08-a.jpg",
+        "photo_hist": "",
+        "timeline": "1906年｜李友邦出生于台北｜1939年｜在金华组建台湾义勇队｜1945年｜率队返台｜兑山纪念馆建成开放"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [118.073, 24.452] },
+      "properties": {
+        "name": "升平路50号台湾义勇队驻地旧址",
+        "level": "C",
+        "address": "厦门市思明区升平路50号（民立小学左侧斜对面）",
+        "type": "建筑旧址",
+        "year": "1945",
+        "people": "李友邦、台湾义勇队",
+        "protect": "未定级",
+        "edu": "",
+        "status": "建筑尚存，但无标识牌，现作为居民小区",
+        "blurb": "1945年抗战胜利后，李友邦率台湾义勇队返台前在厦门的驻地，红砖楼建筑，原貌犹在。",
+        "photo_now": "xm02-b.jpg",
+        "photo_hist": "",
+        "timeline": "1939年｜台湾义勇队在金华成立｜1945年｜抗战胜利，义勇队驻厦门升平路50号｜李友邦率队返回台湾"
+      }
+    }
+  ]
+}

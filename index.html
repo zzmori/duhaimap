@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>太行遗产地图 — 涉台抗日红色遗址点位可视化分布图</title>
+
+  <!-- Leaflet CSS（本地文件，无需联网） -->
+  <link rel="stylesheet" href="lib/leaflet.css" />
+
+  <!-- 自定义档案卡片样式 -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    /* ====== 全局与页面布局 ====== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", serif;
+      background: #f5f1eb;
+    }
+
+    .page-header {
+      background: linear-gradient(135deg, #3a2a1a 0%, #5a3a1a 100%);
+      color: #faf6f0;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      position: relative;
+      z-index: 1000;
+    }
+
+    .page-header__icon { font-size: 28px; }
+
+    .page-header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .page-header__sub {
+      font-size: 12px;
+      opacity: 0.75;
+      letter-spacing: 0.06em;
+    }
+
+    /* ====== 地图容器 ====== */
+    #map {
+      width: 100%;
+      height: calc(100vh - 60px);
+    }
+
+    .leaflet-container {
+      background: #f5f1eb;
+    }
+
+    /* ====== 第六章 功能二：左侧侧边栏 ====== */
+    .sidebar {
+      position: absolute;
+      top: 140px;
+      left: 12px;
+      width: 320px;
+      max-height: calc(100vh - 170px);
+      z-index: 900;
+      background: rgba(250, 246, 240, 0.96);
+      border: 1px solid #c8b898;
+      border-radius: 4px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar__header {
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid #d4c4a8;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-shrink: 0;
+    }
+
+    .sidebar__title {
+      font-family: "Noto Serif SC", "STSong", "SimSun", Georgia, serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #3a2a1a;
+      letter-spacing: 0.04em;
+    }
+
+    .sidebar__count {
+      font-size: 12px;
+      color: #8b7355;
+      letter-spacing: 0.04em;
+    }
+
+    .sidebar__list {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .sidebar__list::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sidebar__list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .sidebar__list::-webkit-scrollbar-thumb {
+      background: #d4c4a8;
+      border-radius: 2px;
+    }
+
+    /* --- 列表项 --- */
+    .sidebar-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #e8ddd0;
+      transition: background 0.15s;
+    }
+
+    .sidebar-item:hover {
+      background: rgba(200, 180, 140, 0.15);
+    }
+
+    .sidebar-item--active {
+      background: rgba(180, 140, 80, 0.18);
+      border-left: 3px solid #b8956a;
+      padding-left: 13px;
+    }
+
+    .sidebar-item__badge {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.06em;
+      margin-top: 2px;
+    }
+
+    .sidebar-item__badge--A { background: #c0392b; }
+    .sidebar-item__badge--B { background: #2c6faa; }
+    .sidebar-item__badge--C { background: #3d8b5e; }
+
+    .sidebar-item__info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sidebar-item__name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #3a2a1a;
+      line-height: 1.4;
+      font-family: "Noto Serif SC", "STSong", "SimSun", Georgia, serif;
+    }
+
+    .sidebar-item__address {
+      font-size: 11px;
+      color: #8b7355;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* --- 侧边栏收起按钮 --- */
+    .sidebar__toggle {
+      position: absolute;
+      top: 140px;
+      left: 334px;
+      z-index: 901;
+      width: 22px;
+      height: 42px;
+      background: rgba(250, 246, 240, 0.96);
+      border: 1px solid #c8b898;
+      border-left: none;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
+      font-size: 12px;
+      color: #6b5840;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 0 6px rgba(0,0,0,0.06);
+      transition: left 0.3s;
+    }
+
+    .sidebar--collapsed {
+      transform: translateX(-336px);
+      transition: transform 0.3s;
+    }
+
+    .sidebar--collapsed + .sidebar__toggle {
+      left: 12px;
+      border-left: 1px solid #c8b898;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 顶部标题栏 -->
+  <div class="page-header">
+    <span class="page-header__icon">🏯</span>
+    <div>
+      <h1>涉台抗日红色遗址点位可视化分布图</h1>
+      <div class="page-header__sub">金华市 · 厦门市 — 太行遗产地图</div>
+    </div>
+  </div>
+
+  <!-- 地图容器 -->
+  <div id="map"></div>
+
+  <!-- ====== 第六章 功能二：左侧侧边栏 ====== -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar__header">
+      <span class="sidebar__title">遗址列表</span>
+      <span class="sidebar__count" id="sidebar-count">—</span>
+    </div>
+    <div class="sidebar__list" id="sidebar-list">
+      <!-- JS 动态生成 -->
+    </div>
+  </div>
+  <div class="sidebar__toggle" id="sidebar-toggle" title="收起/展开侧边栏">◀</div>
+
+  <!-- Leaflet JS（本地文件，无需联网） -->
+  <script src="lib/leaflet.js"></script>
+
+  <!-- 业务脚本 -->
+  <script src="js/map.js"></script>
+
+  <script>
+    // ==============================================
+    //  初始化地图
+    // ==============================================
+    var map = L.map('map').setView([26.5, 118.5], 8);
+
+    // ---- 底图：高德地图中文注记 ----
+    var amapLayer = L.tileLayer(
+      'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+      {
+        subdomains: '1234',
+        maxZoom: 18,
+        attribution: '&copy; 高德地图',
+      }
+    );
+
+    // ---- 备用底图：OpenStreetMap ----
+    var osmLayer = L.tileLayer(
+      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 贡献者',
+      }
+    );
+
+    amapLayer.addTo(map);
+    amapLayer.on('tileerror', function () {
+      console.warn('高德瓦片加载失败，自动切换到 OpenStreetMap 备用底图');
+      map.removeLayer(amapLayer);
+      osmLayer.addTo(map);
+    });
+
+    // ==============================================
+    //  侧边栏 — 折叠/展开
+    // ==============================================
+    var sidebar = document.getElementById('sidebar');
+    var sidebarToggle = document.getElementById('sidebar-toggle');
+    var sidebarCollapsed = false;
+
+    sidebarToggle.addEventListener('click', function () {
+      sidebarCollapsed = !sidebarCollapsed;
+      if (sidebarCollapsed) {
+        sidebar.classList.add('sidebar--collapsed');
+        sidebarToggle.textContent = '▶';
+      } else {
+        sidebar.classList.remove('sidebar--collapsed');
+        sidebarToggle.textContent = '◀';
+      }
+    });
+
+    // ==============================================
+    //  第六章 功能二：侧边栏列表生成 & 双向联动
+    // ==============================================
+    var markerRegistry = [];   // [{ marker, feature, listItem }]
+
+    /**
+     * 高亮指定索引的列表项，并滚动到可见区域
+     */
+    function highlightSidebarItem(index) {
+      // 清除所有高亮
+      var items = document.querySelectorAll('.sidebar-item');
+      for (var k = 0; k < items.length; k++) {
+        items[k].classList.remove('sidebar-item--active');
+      }
+      // 高亮目标
+      if (index >= 0 && index < markerRegistry.length) {
+        var entry = markerRegistry[index];
+        if (entry && entry.listItem) {
+          entry.listItem.classList.add('sidebar-item--active');
+          entry.listItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+      }
+    }
+
+    /**
+     * 根据 GeoJSON 构建侧边栏列表
+     */
+    function buildSidebarList(geojson) {
+      var listContainer = document.getElementById('sidebar-list');
+      var countEl = document.getElementById('sidebar-count');
+      listContainer.innerHTML = '';
+
+      var features = geojson.features;
+      countEl.textContent = '共 ' + features.length + ' 处';
+
+      for (var i = 0; i < features.length; i++) {
+        var props = features[i].properties || {};
+        var level = (props.level || 'C').toUpperCase();
+
+        // 创建列表项 DOM
+        var item = document.createElement('div');
+        item.className = 'sidebar-item';
+
+        // 等级圆形徽章
+        var badge = document.createElement('span');
+        badge.className = 'sidebar-item__badge sidebar-item__badge--' + level;
+        badge.textContent = level;
+
+        // 信息区
+        var info = document.createElement('div');
+        info.className = 'sidebar-item__info';
+
+        var nameEl = document.createElement('div');
+        nameEl.className = 'sidebar-item__name';
+        nameEl.textContent = props.name || '（未命名）';
+
+        var addrEl = document.createElement('div');
+        addrEl.className = 'sidebar-item__address';
+        addrEl.textContent = props.address || '';
+
+        info.appendChild(nameEl);
+        info.appendChild(addrEl);
+        item.appendChild(badge);
+        item.appendChild(info);
+
+        // 列表项点击 → flyTo + 打开 popup
+        (function (idx) {
+          item.addEventListener('click', function () {
+            var entry = markerRegistry[idx];
+            if (!entry || !entry.marker) return;
+
+            var latlng = entry.marker.getLatLng();
+            map.flyTo(latlng, 15, { duration: 0.8 });
+            entry.marker.openPopup();
+            highlightSidebarItem(idx);
+          });
+        })(i);
+
+        listContainer.appendChild(item);
+
+        // 暂存列表项引用（marker 尚未创建，先存 listItem）
+        markerRegistry.push({ marker: null, feature: features[i], listItem: item });
+      }
+    }
+
+    /**
+     * 将已创建的 marker 绑定到 registry 并注册联动事件
+     */
+    function bindMarkerEvents(group) {
+      group.eachLayer(function (layer) {
+        var idx = layer._heritageIndex;
+        if (idx == null || !markerRegistry[idx]) return;
+
+        markerRegistry[idx].marker = layer;
+
+        // marker 被点击（popup 打开）→ 高亮对应列表项
+        layer.on('popupopen', function () {
+          highlightSidebarItem(idx);
+        });
+      });
+    }
+
+    // ==============================================
+    //  内嵌 GeoJSON 数据（无需 fetch，双击打开也能用）
+    // ==============================================
+    var SITES_DATA = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[119.6525,29.0916]},"properties":{"name":"台湾义勇队旧址","level":"A","address":"浙江省金华市婺城区酒坊巷84号","type":"抗战遗址","year":"1939","people":"李友邦","protect":"全国重点文物保护单位","edu":"国家级抗战纪念设施","status":"保存完好，已辟为纪念馆","blurb":"1939年2月，台湾爱国志士李友邦在金华组建台湾义勇队，以「保卫祖国，收复台湾」为宗旨，是抗战时期台湾同胞在大陆组建的最具影响力的抗日团体。","photo_now":"yi-yong-dui-now.jpg","photo_hist":"yi-yong-dui-hist.jpg","timeline":"1939年｜台湾义勇队在金华酒坊巷成立｜李友邦任队长｜1942年｜浙赣战役中开展战地救护｜1945年｜抗战胜利后返回台湾"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[119.6448,29.1028]},"properties":{"name":"台湾少年团旧址","level":"A","address":"浙江省金华市婺城区旌孝街","type":"抗战遗址","year":"1939","people":"李友邦、台湾少年团团员","protect":"省级文物保护单位","edu":"省级爱国主义教育基地","status":"建筑尚存，需进一步修缮","blurb":"台湾少年团是台湾义勇队下属的少年儿童抗日宣传团体，由流亡大陆的台湾籍少年儿童组成，以歌咏、戏剧等形式在东南沿海开展抗日救亡宣传。","photo_now":"shao-nian-tuan-now.jpg","photo_hist":"shao-nian-tuan-hist.jpg","timeline":"1939年｜台湾少年团在金华成立｜1941年｜赴闽浙赣各地巡回宣传｜1943年｜团员发展至百余人｜1945年｜随义勇队返回台湾"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[118.0894,24.4798]},"properties":{"name":"厦门台湾公会旧址","level":"B","address":"福建省厦门市思明区鹭江道","type":"涉台遗址","year":"1937","people":"台湾抗日志士","protect":"市级文物保护单位","edu":"市级爱国主义教育基地","status":"部分保留，已立碑标示","blurb":"厦门台湾公会是抗战前及抗战初期在厦台湾同胞的重要组织，七七事变后许多台胞经此投身祖国抗战，是连接两岸同胞共同抗日的重要历史见证。","photo_now":"taiwan-gonghui-now.jpg","photo_hist":"taiwan-gonghui-hist.jpg","timeline":"1937年｜七七事变后组织台胞撤离｜1938年｜厦门沦陷前开展救亡｜1945年｜抗战胜利后复会"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[119.6721,29.1135]},"properties":{"name":"金华山抗战遗址群","level":"B","address":"浙江省金华市金华山","type":"抗战遗址","year":"1942","people":"浙东游击纵队","protect":"省级文物保护单位","edu":"省级爱国主义教育基地","status":"部分遗址保存完好","blurb":"金华山是浙赣战役的重要战场，山中有多处抗战时期留下的战壕、指挥所等遗址，见证了浙东军民浴血奋战的历史。","photo_now":"jinhuashan-now.jpg","photo_hist":"jinhuashan-hist.jpg","timeline":"1942年｜浙赣战役爆发｜金华山阻击战打响｜1943年｜游击区建立｜1945年｜迎来抗战胜利"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[118.1025,24.4528]},"properties":{"name":"鼓浪屿抗日遗址","level":"B","address":"福建省厦门市思明区鼓浪屿","type":"抗战遗址","year":"1938","people":"厦门各界抗日团体","protect":"世界文化遗产地","edu":"国家级爱国主义教育基地","status":"保存完好","blurb":"鼓浪屿在抗战期间曾是许多抗日团体和爱国人士的活动据点，岛上的多处建筑见证了那段烽火岁月。","photo_now":"gulangyu-now.jpg","photo_hist":"gulangyu-hist.jpg","timeline":"1938年｜厦门沦陷｜鼓浪屿成抗日据点｜1941年｜情报联络站建立｜1945年｜抗战胜利"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[119.6352,29.0761]},"properties":{"name":"金华抗日阵亡将士纪念碑","level":"C","address":"浙江省金华市婺城区人民广场","type":"纪念设施","year":"1946","people":"金华军民","protect":"市级文物保护单位","edu":"市级爱国主义教育基地","status":"保存完好，每年清明举行祭扫","blurb":"为纪念在抗日战争中牺牲的金华籍将士及在金华地区牺牲的抗日英烈而建，是金华重要的抗战纪念设施。","photo_now":"jinianbei-now.jpg","photo_hist":"jinianbei-hist.jpg","timeline":"1946年｜纪念碑落成｜1949年后｜多次修缮｜2015年｜列入抗战纪念设施名录"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[118.0712,24.4683]},"properties":{"name":"厦门五通灯塔抗日遗址","level":"C","address":"福建省厦门市湖里区五通码头","type":"抗战遗址","year":"1938","people":"厦门守军","protect":"市级文物保护单位","edu":"区级爱国主义教育基地","status":"遗址尚存，周边环境已变化","blurb":"五通灯塔一带是1938年5月日军登陆厦门的主要地点之一，中国守军在此进行了顽强抵抗，书写了厦门抗战史上的悲壮一页。","photo_now":"wutong-now.jpg","photo_hist":"wutong-hist.jpg","timeline":"1938年5月10日｜日军在五通登陆｜守军浴血抵抗｜5月13日｜厦门沦陷｜1945年｜光复"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[119.6588,29.0872]},"properties":{"name":"金华台湾医院旧址","level":"C","address":"浙江省金华市婺城区","type":"涉台遗址","year":"1939","people":"台湾义勇队医疗队","protect":"市级文物保护单位","edu":"未定级","status":"建筑已改建，仅存碑记","blurb":"台湾义勇队附设的台湾医院，由台籍医师主持，不仅为队员提供医疗服务，还积极为金华当地百姓义诊，是两岸同胞患难与共的生动体现。","photo_now":"taiwan-yiyuan-now.jpg","photo_hist":"taiwan-yiyuan-hist.jpg","timeline":"1939年｜台湾医院成立｜1942年｜浙赣战役中紧急救治伤员｜1943年｜随义勇队转移福建"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[118.049,24.606]},"properties":{"name":"集美兑山李友邦将军纪念馆","level":"C","address":"厦门市集美区后溪镇兑山村","type":"纪念场馆","year":"","people":"李友邦、陈云林","protect":"未定级","edu":"","status":"纪念馆已建成开放","blurb":"李友邦将军祖籍地为同安兑山（今集美兑山村），纪念馆展示李友邦将军事迹，陈云林题词。","photo_now":"xm08-a.jpg","photo_hist":"","timeline":"1906年｜李友邦出生于台北｜1939年｜在金华组建台湾义勇队｜1945年｜率队返台｜兑山纪念馆建成开放"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[118.073,24.452]},"properties":{"name":"升平路50号台湾义勇队驻地旧址","level":"C","address":"厦门市思明区升平路50号（民立小学左侧斜对面）","type":"建筑旧址","year":"1945","people":"李友邦、台湾义勇队","protect":"未定级","edu":"","status":"建筑尚存，但无标识牌，现作为居民小区","blurb":"1945年抗战胜利后，李友邦率台湾义勇队返台前在厦门的驻地，红砖楼建筑，原貌犹在。","photo_now":"xm02-b.jpg","photo_hist":"","timeline":"1939年｜台湾义勇队在金华成立｜1945年｜抗战胜利，义勇队驻厦门升平路50号｜李友邦率队返回台湾"}}]};
+
+    // ==============================================
+    //  加载遗址数据（内嵌数据，无需 fetch）
+    // ==============================================
+    var heritageLayer = L.featureGroup().addTo(map);
+
+    // 直接使用内嵌的 SITES_DATA，无需 fetch，双击 file:// 也能正常加载
+    (function () {
+      var geojson = SITES_DATA;
+      console.log('遗址数据加载成功，共 ' + geojson.features.length + ' 个点位');
+
+      // 第六章 功能二：先生成侧边栏列表
+      buildSidebarList(geojson);
+
+      // 第六章 功能一：渲染 marker
+      renderHeritageMarkers(map, geojson, heritageLayer);
+
+      // 绑定 marker ↔ 列表项 双向联动
+      bindMarkerEvents(heritageLayer);
+
+      // 自动缩放到所有点位
+      var bounds = heritageLayer.getBounds();
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+      }
+    })();
+  </script>
+
+</body>
+</html>
