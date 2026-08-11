@@ -1,0 +1,262 @@
+/* ========================================
+   太行遗产地图 — 档案卡片样式
+   Archive Card Style for Heritage Map
+   ======================================== */
+
+/* --- Leaflet Popup 覆盖 --- */
+.leaflet-popup-content-wrapper {
+  border-radius: 4px !important;
+  padding: 0 !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  min-width: 380px;
+  max-width: 420px;
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", "FangSong", Georgia, "Times New Roman", serif;
+  line-height: 1.7;
+}
+
+/* --- 档案卡片主体 --- */
+.heritage-card {
+  background: #faf6f0;               /* 米白/奶油底 */
+  border: 1px solid #c8b898;         /* 细边框，暖棕色 */
+  position: relative;
+  overflow: hidden;
+}
+
+/* 档案卡纹理 — 模拟旧纸张 */
+.heritage-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(180, 160, 120, 0.03) 2px,
+      rgba(180, 160, 120, 0.03) 4px
+    );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* --- 卡片头部 --- */
+.heritage-card__header {
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid #d4c4a8;
+  position: relative;
+  z-index: 2;
+}
+
+.heritage-card__title {
+  font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", "FangSong", Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #3a2a1a;
+  margin: 0 0 6px;
+  letter-spacing: 0.05em;
+}
+
+.heritage-card__level {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  padding: 2px 10px;
+  border-radius: 2px;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.heritage-card__level--A {
+  background: #c0392b;
+  color: #fff;
+}
+
+.heritage-card__level--B {
+  background: #2c6faa;
+  color: #fff;
+}
+
+.heritage-card__level--C {
+  background: #3d8b5e;
+  color: #fff;
+}
+
+/* --- 卡片正文 --- */
+.heritage-card__body {
+  padding: 14px 18px 16px;
+  position: relative;
+  z-index: 2;
+}
+
+/* --- 信息字段行 --- */
+.heritage-card__fields {
+  margin: 0 0 14px;
+}
+
+.heritage-card__field {
+  display: flex;
+  align-items: baseline;
+  padding: 4px 0;
+  font-size: 14px;
+  color: #4a3828;
+  border-bottom: 1px dotted #e0d4c0;
+}
+
+.heritage-card__field:last-child {
+  border-bottom: none;
+}
+
+.heritage-card__field-label {
+  flex-shrink: 0;
+  width: 58px;
+  font-size: 12px;
+  color: #8b7355;
+  letter-spacing: 0.06em;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.heritage-card__field-label::after {
+  content: "：";
+}
+
+.heritage-card__field-value {
+  flex: 1;
+  font-size: 14px;
+  color: #2a1f14;
+}
+
+/* --- 简介（单独区块） --- */
+.heritage-card__blurb {
+  margin: 12px 0 14px;
+  padding: 10px 14px;
+  background: rgba(200, 180, 140, 0.12);
+  border-left: 3px solid #b8956a;
+  font-size: 13px;
+  line-height: 1.8;
+  color: #4a3828;
+  text-align: justify;
+}
+
+/* --- 照片区 --- */
+.heritage-card__photos {
+  display: flex;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.heritage-card__photo {
+  flex: 1;
+  text-align: center;
+}
+
+.heritage-card__photo-label {
+  font-size: 11px;
+  color: #8b7355;
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.heritage-card__photo-img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border: 1px solid #d4c4a8;
+  border-radius: 2px;
+  background: #e8ddd0;
+  display: block;
+}
+
+/* --- 时间线 --- */
+.heritage-card__timeline {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #d4c4a8;
+}
+
+.heritage-card__timeline-title {
+  font-size: 12px;
+  color: #8b7355;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.heritage-card__timeline-track {
+  display: flex;
+  align-items: flex-start;
+  overflow-x: auto;
+  gap: 0;
+  padding: 8px 0 4px;
+}
+
+.heritage-card__timeline-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  position: relative;
+  min-width: 72px;
+}
+
+.heritage-card__timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #b8956a;
+  border: 2px solid #faf6f0;
+  outline: 1px solid #b8956a;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.heritage-card__timeline-line {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  width: 100%;
+  height: 1px;
+  background: #c8b898;
+  z-index: 0;
+}
+
+.heritage-card__timeline-item:last-child .heritage-card__timeline-line {
+  display: none;
+}
+
+.heritage-card__timeline-year {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #3a2a1a;
+  text-align: center;
+  line-height: 1.3;
+  font-family: Georgia, "Times New Roman", "Noto Serif SC", serif;
+}
+
+.heritage-card__timeline-event {
+  font-size: 10px;
+  color: #6b5840;
+  text-align: center;
+  margin-top: 2px;
+  line-height: 1.4;
+  max-width: 80px;
+}
+
+/* --- 滚动条美化 --- */
+.heritage-card__timeline-track::-webkit-scrollbar {
+  height: 3px;
+}
+
+.heritage-card__timeline-track::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.heritage-card__timeline-track::-webkit-scrollbar-thumb {
+  background: #d4c4a8;
+  border-radius: 2px;
+}

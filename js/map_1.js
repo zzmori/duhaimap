@@ -54,9 +54,7 @@ function getPinIcon(level) {
  */
 function buildTimelineHTML(timelineStr) {
   if (!timelineStr || typeof timelineStr !== 'string') {
-    return '<div class="heritage-card__timeline heritage-card__timeline--empty">' +
-      '<div class="heritage-card__timeline-title">📅 历史时间线</div>' +
-      '<div class="heritage-card__timeline-track">&nbsp;</div></div>';
+    return '';
   }
 
   var segments = timelineStr.split('｜'); // 全角竖线 U+FF5C
@@ -146,7 +144,6 @@ function buildCardHTML(props) {
   var levelClass = 'heritage-card__level--' + (level || 'C');
 
   var fields = [
-    { label: '编号',   value: props.id      },
     { label: '名称',   value: props.name    },
     { label: '地址',   value: props.address  },
     { label: '类型',   value: props.type     },
@@ -155,7 +152,6 @@ function buildCardHTML(props) {
     { label: '保护',   value: props.protect  },
     { label: '教育',   value: props.edu      },
     { label: '现状',   value: props.status   },
-    { label: '参考',   value: props.reference },
   ];
 
   var html = '<div class="heritage-card">';
@@ -171,17 +167,19 @@ function buildCardHTML(props) {
   html += '<div class="heritage-card__fields">';
   for (var i = 0; i < fields.length; i++) {
     var f = fields[i];
-    html += '<div class="heritage-card__field">';
-    html += '<span class="heritage-card__field-label">' + escapeHTML(f.label) + '</span>';
-    html += '<span class="heritage-card__field-value">' +
-      (f.value ? escapeHTML(String(f.value)) : '&nbsp;') + '</span>';
-    html += '</div>';
+    if (f.value) {
+      html += '<div class="heritage-card__field">';
+      html += '<span class="heritage-card__field-label">' + escapeHTML(f.label) + '</span>';
+      html += '<span class="heritage-card__field-value">' + escapeHTML(String(f.value)) + '</span>';
+      html += '</div>';
+    }
   }
   html += '</div>';
 
   // -- 简介 --
-  html += '<div class="heritage-card__blurb">' +
-    (props.blurb ? escapeHTML(props.blurb) : '&nbsp;') + '</div>';
+  if (props.blurb) {
+    html += '<div class="heritage-card__blurb">' + escapeHTML(props.blurb) + '</div>';
+  }
 
   // -- 照片区 --
   html += buildPhotosHTML(props.photo_now, props.photo_hist);

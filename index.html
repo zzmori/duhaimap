@@ -46,6 +46,144 @@
       letter-spacing: 0.06em;
     }
 
+    .map-filters {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    }
+
+    .map-filter {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .map-filter select {
+      height: 30px;
+      min-width: 84px;
+      padding: 0 28px 0 10px;
+      color: #3a2a1a;
+      background: #faf6f0;
+      border: 1px solid rgba(255,255,255,0.45);
+      border-radius: 3px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .map-filter__count {
+      min-width: 142px;
+      padding-left: 12px;
+      border-left: 1px solid rgba(255,255,255,0.28);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .site-search {
+      position: relative;
+      width: 230px;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    }
+
+    .site-search__input {
+      width: 100%;
+      height: 30px;
+      padding: 0 30px 0 10px;
+      color: #3a2a1a;
+      background: #faf6f0;
+      border: 1px solid rgba(255,255,255,0.45);
+      border-radius: 3px;
+      outline: none;
+      font-size: 13px;
+    }
+
+    .site-search__input:focus {
+      border-color: #d8bd91;
+      box-shadow: 0 0 0 2px rgba(216,189,145,0.2);
+    }
+
+    .site-search__icon {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      pointer-events: none;
+      font-size: 14px;
+      color: #806849;
+    }
+
+    .site-search__results {
+      display: none;
+      position: absolute;
+      top: 36px;
+      left: 0;
+      width: 310px;
+      max-height: 320px;
+      overflow-y: auto;
+      background: #faf6f0;
+      border: 1px solid #c8b898;
+      border-radius: 3px;
+      box-shadow: 0 5px 18px rgba(42,30,18,0.25);
+      z-index: 1200;
+    }
+
+    .site-search__results--open { display: block; }
+
+    .site-search__result {
+      padding: 9px 11px;
+      color: #3a2a1a;
+      border-bottom: 1px solid #e8ddd0;
+      cursor: pointer;
+    }
+
+    .site-search__result:last-child { border-bottom: none; }
+    .site-search__result:hover { background: #eee3d3; }
+
+    .site-search__result-name {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .site-search__result-meta {
+      margin-top: 2px;
+      color: #8b7355;
+      font-size: 11px;
+    }
+
+    .site-search__empty {
+      padding: 12px;
+      color: #8b7355;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .page-header {
+        padding: 9px 12px;
+        flex-wrap: wrap;
+      }
+
+      .page-header__icon { display: none; }
+      .page-header h1 { font-size: 16px; }
+      .map-filters {
+        width: 100%;
+        margin-left: 0;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .site-search { width: 100%; }
+      .site-search__results { width: 100%; }
+      .map-filter__count {
+        min-width: 0;
+        margin-left: auto;
+      }
+      #map { height: calc(100vh - 104px); }
+    }
+
     /* ====== 地图容器 ====== */
     #map {
       width: 100%;
@@ -219,6 +357,32 @@
       <h1>涉台抗日红色遗址点位可视化分布图</h1>
       <div class="page-header__sub">金华市 · 厦门市 — 太行遗产地图</div>
     </div>
+    <div class="map-filters" aria-label="遗址筛选">
+      <div class="site-search">
+        <input class="site-search__input" id="site-search-input" type="search"
+               placeholder="搜索人名、地名或编号" autocomplete="off">
+        <span class="site-search__icon">⌕</span>
+        <div class="site-search__results" id="site-search-results"></div>
+      </div>
+      <label class="map-filter">
+        <span>城市</span>
+        <select id="city-filter">
+          <option value="all">全部</option>
+          <option value="JH">金华</option>
+          <option value="XM">厦门</option>
+        </select>
+      </label>
+      <label class="map-filter">
+        <span>级别</span>
+        <select id="level-filter">
+          <option value="all">全部</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+        </select>
+      </label>
+      <div class="map-filter__count" id="filter-count">当前显示 22 / 共 22 处</div>
+    </div>
   </div>
 
   <!-- 地图容器 -->
@@ -241,6 +405,7 @@
 
   <!-- 业务脚本 -->
   <script src="js/map.js"></script>
+  <script src="js/sites-data.js"></script>
 
   <script>
     // ==============================================
@@ -248,31 +413,29 @@
     // ==============================================
     var map = L.map('map').setView([26.5, 118.5], 8);
 
-    // ---- 底图：高德地图中文注记（缩放限制：最大 12 级，仅显示简单路网） ----
-    var amapLayer = L.tileLayer(
-      'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+    // ---- 底图：CartoDB Positron 极简浅色底图 ----
+    var positronLayer = L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
       {
-        subdomains: '1234',
-        maxZoom: 18,
-        maxNativeZoom: 12,
-        attribution: '&copy; 高德地图',
+        subdomains: 'abcd',
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       }
     );
 
-    // ---- 备用底图：OpenStreetMap（同步限制） ----
+    // ---- 备用底图：OpenStreetMap ----
     var osmLayer = L.tileLayer(
       'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       {
         maxZoom: 19,
-        maxNativeZoom: 12,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 贡献者',
       }
     );
 
-    amapLayer.addTo(map);
-    amapLayer.on('tileerror', function () {
-      console.warn('高德瓦片加载失败，自动切换到 OpenStreetMap 备用底图');
-      map.removeLayer(amapLayer);
+    positronLayer.addTo(map);
+    positronLayer.on('tileerror', function () {
+      console.warn('CartoDB Positron 加载失败，自动切换到 OpenStreetMap 备用底图');
+      map.removeLayer(positronLayer);
       osmLayer.addTo(map);
     });
 
@@ -298,6 +461,161 @@
     //  第六章 功能二：侧边栏列表生成 & 双向联动
     // ==============================================
     var markerRegistry = [];   // [{ marker, feature, listItem }]
+    var totalSiteCount = 0;
+    var storyLineLayer = L.featureGroup().addTo(map);
+
+    map.createPane('storyLinePane');
+    map.getPane('storyLinePane').style.zIndex = 425;
+
+    function getFeatureCity(feature) {
+      var id = String((feature.properties || {}).id || '').toUpperCase();
+      return id.indexOf('JH-') === 0 ? 'JH' : (id.indexOf('XM-') === 0 ? 'XM' : '');
+    }
+
+    function drawAntiWarStoryLine(geojson) {
+      var routeIds = ['JH-01', 'JH-02', 'JH-03', 'XM-07', 'XM-03', 'XM-02', 'XM-01'];
+      var featureById = {};
+      var routePoints = [];
+
+      storyLineLayer.clearLayers();
+
+      for (var i = 0; i < geojson.features.length; i++) {
+        var feature = geojson.features[i];
+        var id = String((feature.properties || {}).id || '').toUpperCase();
+        featureById[id] = feature;
+      }
+
+      for (var j = 0; j < routeIds.length; j++) {
+        var routeFeature = featureById[routeIds[j]];
+        if (!routeFeature || !routeFeature.geometry ||
+            routeFeature.geometry.type !== 'Point') continue;
+
+        var coords = routeFeature.geometry.coordinates;
+        routePoints.push([coords[1], coords[0]]);
+      }
+
+      if (routePoints.length < 2) return;
+
+      var storyLine = L.polyline(routePoints, {
+        pane: 'storyLinePane',
+        color: '#8f2f25',
+        weight: 4,
+        opacity: 0.78,
+        dashArray: '10 9',
+        lineCap: 'round',
+        lineJoin: 'round'
+      });
+
+      storyLine.bindTooltip(
+        '台湾义勇队抗战活动故事线（示意连接，非实际行进路线）',
+        { sticky: true, direction: 'top', opacity: 0.95 }
+      );
+      storyLine.addTo(storyLineLayer);
+    }
+
+    function applyFilters() {
+      var city = document.getElementById('city-filter').value;
+      var level = document.getElementById('level-filter').value;
+      var visibleCount = 0;
+
+      for (var i = 0; i < markerRegistry.length; i++) {
+        var entry = markerRegistry[i];
+        var props = entry.feature.properties || {};
+        var cityMatches = city === 'all' || getFeatureCity(entry.feature) === city;
+        var levelMatches = level === 'all' || String(props.level || '').toUpperCase() === level;
+        var shouldShow = cityMatches && levelMatches;
+
+        entry.listItem.style.display = shouldShow ? '' : 'none';
+
+        if (entry.marker) {
+          if (shouldShow && !heritageLayer.hasLayer(entry.marker)) {
+            heritageLayer.addLayer(entry.marker);
+          } else if (!shouldShow && heritageLayer.hasLayer(entry.marker)) {
+            heritageLayer.removeLayer(entry.marker);
+          }
+        }
+
+        if (shouldShow) visibleCount++;
+      }
+
+      document.getElementById('filter-count').textContent =
+        '当前显示 ' + visibleCount + ' / 共 ' + totalSiteCount + ' 处';
+      document.getElementById('sidebar-count').textContent =
+        '显示 ' + visibleCount + ' / ' + totalSiteCount + ' 处';
+    }
+
+    function locateSearchResult(index) {
+      var entry = markerRegistry[index];
+      if (!entry || !entry.marker) return;
+
+      // 搜索结果可能被组合筛选隐藏；定位时恢复全部显示。
+      document.getElementById('city-filter').value = 'all';
+      document.getElementById('level-filter').value = 'all';
+      applyFilters();
+
+      var latlng = entry.marker.getLatLng();
+      map.flyTo(latlng, 15, { duration: 0.8 });
+      entry.marker.openPopup();
+      highlightSidebarItem(index);
+
+      document.getElementById('site-search-results')
+        .classList.remove('site-search__results--open');
+    }
+
+    function updateSearchResults() {
+      var input = document.getElementById('site-search-input');
+      var container = document.getElementById('site-search-results');
+      var keyword = input.value.trim().toLowerCase();
+      container.innerHTML = '';
+
+      if (!keyword) {
+        container.classList.remove('site-search__results--open');
+        return;
+      }
+
+      var matches = [];
+      for (var i = 0; i < markerRegistry.length; i++) {
+        var props = markerRegistry[i].feature.properties || {};
+        var searchable = [
+          props.id,
+          props.name,
+          props.address,
+          props.people,
+          props.blurb,
+          props.type
+        ].join(' ').toLowerCase();
+
+        if (searchable.indexOf(keyword) !== -1) matches.push(i);
+      }
+
+      if (matches.length === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'site-search__empty';
+        empty.textContent = '没有找到相关遗址';
+        container.appendChild(empty);
+      } else {
+        for (var j = 0; j < matches.length; j++) {
+          (function (idx) {
+            var props = markerRegistry[idx].feature.properties || {};
+            var result = document.createElement('div');
+            result.className = 'site-search__result';
+            result.innerHTML =
+              '<div class="site-search__result-name">' +
+              escapeHTML((props.id || '') + ' · ' + (props.name || '未命名遗址')) +
+              '</div><div class="site-search__result-meta">' +
+              escapeHTML((getFeatureCity(markerRegistry[idx].feature) === 'JH' ? '金华' : '厦门') +
+                ' · ' + (props.level || '') + '级 · ' + (props.address || '地址待补充')) +
+              '</div>';
+            result.addEventListener('click', function () {
+              locateSearchResult(idx);
+            });
+            container.appendChild(result);
+          })(matches[j]);
+        }
+      }
+
+      container.classList.add('site-search__results--open');
+    }
 
     /**
      * 高亮指定索引的列表项，并滚动到可见区域
@@ -327,6 +645,7 @@
       listContainer.innerHTML = '';
 
       var features = geojson.features;
+      totalSiteCount = features.length;
       countEl.textContent = '共 ' + features.length + ' 处';
 
       for (var i = 0; i < features.length; i++) {
@@ -399,7 +718,7 @@
     // ==============================================
     //  内嵌 GeoJSON 数据（无需 fetch，双击打开也能用）
     // ==============================================
-    var SITES_DATA = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[119.6525,29.0916]},"properties":{"name":"台湾义勇队旧址","level":"A","address":"浙江省金华市婺城区酒坊巷84号","type":"抗战遗址","year":"1939","people":"李友邦","protect":"全国重点文物保护单位","edu":"国家级抗战纪念设施","status":"保存完好，已辟为纪念馆","blurb":"1939年2月，台湾爱国志士李友邦在金华组建台湾义勇队，以「保卫祖国，收复台湾」为宗旨，是抗战时期台湾同胞在大陆组建的最具影响力的抗日团体。","photo_now":"yi-yong-dui-now.jpg","photo_hist":"yi-yong-dui-hist.jpg","timeline":"1939年｜台湾义勇队在金华酒坊巷成立｜李友邦任队长｜1942年｜浙赣战役中开展战地救护｜1945年｜抗战胜利后返回台湾"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[119.6448,29.1028]},"properties":{"name":"台湾少年团旧址","level":"A","address":"浙江省金华市婺城区旌孝街","type":"抗战遗址","year":"1939","people":"李友邦、台湾少年团团员","protect":"省级文物保护单位","edu":"省级爱国主义教育基地","status":"建筑尚存，需进一步修缮","blurb":"台湾少年团是台湾义勇队下属的少年儿童抗日宣传团体，由流亡大陆的台湾籍少年儿童组成，以歌咏、戏剧等形式在东南沿海开展抗日救亡宣传。","photo_now":"shao-nian-tuan-now.jpg","photo_hist":"shao-nian-tuan-hist.jpg","timeline":"1939年｜台湾少年团在金华成立｜1941年｜赴闽浙赣各地巡回宣传｜1943年｜团员发展至百余人｜1945年｜随义勇队返回台湾"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[118.0894,24.4798]},"properties":{"name":"厦门台湾公会旧址","level":"B","address":"福建省厦门市思明区鹭江道","type":"涉台遗址","year":"1937","people":"台湾抗日志士","protect":"市级文物保护单位","edu":"市级爱国主义教育基地","status":"部分保留，已立碑标示","blurb":"厦门台湾公会是抗战前及抗战初期在厦台湾同胞的重要组织，七七事变后许多台胞经此投身祖国抗战，是连接两岸同胞共同抗日的重要历史见证。","photo_now":"taiwan-gonghui-now.jpg","photo_hist":"taiwan-gonghui-hist.jpg","timeline":"1937年｜七七事变后组织台胞撤离｜1938年｜厦门沦陷前开展救亡｜1945年｜抗战胜利后复会"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[119.6721,29.1135]},"properties":{"name":"金华山抗战遗址群","level":"B","address":"浙江省金华市金华山","type":"抗战遗址","year":"1942","people":"浙东游击纵队","protect":"省级文物保护单位","edu":"省级爱国主义教育基地","status":"部分遗址保存完好","blurb":"金华山是浙赣战役的重要战场，山中有多处抗战时期留下的战壕、指挥所等遗址，见证了浙东军民浴血奋战的历史。","photo_now":"jinhuashan-now.jpg","photo_hist":"jinhuashan-hist.jpg","timeline":"1942年｜浙赣战役爆发｜金华山阻击战打响｜1943年｜游击区建立｜1945年｜迎来抗战胜利"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[118.1025,24.4528]},"properties":{"name":"鼓浪屿抗日遗址","level":"B","address":"福建省厦门市思明区鼓浪屿","type":"抗战遗址","year":"1938","people":"厦门各界抗日团体","protect":"世界文化遗产地","edu":"国家级爱国主义教育基地","status":"保存完好","blurb":"鼓浪屿在抗战期间曾是许多抗日团体和爱国人士的活动据点，岛上的多处建筑见证了那段烽火岁月。","photo_now":"gulangyu-now.jpg","photo_hist":"gulangyu-hist.jpg","timeline":"1938年｜厦门沦陷｜鼓浪屿成抗日据点｜1941年｜情报联络站建立｜1945年｜抗战胜利"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[119.6352,29.0761]},"properties":{"name":"金华抗日阵亡将士纪念碑","level":"C","address":"浙江省金华市婺城区人民广场","type":"纪念设施","year":"1946","people":"金华军民","protect":"市级文物保护单位","edu":"市级爱国主义教育基地","status":"保存完好，每年清明举行祭扫","blurb":"为纪念在抗日战争中牺牲的金华籍将士及在金华地区牺牲的抗日英烈而建，是金华重要的抗战纪念设施。","photo_now":"jinianbei-now.jpg","photo_hist":"jinianbei-hist.jpg","timeline":"1946年｜纪念碑落成｜1949年后｜多次修缮｜2015年｜列入抗战纪念设施名录"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[118.0712,24.4683]},"properties":{"name":"厦门五通灯塔抗日遗址","level":"C","address":"福建省厦门市湖里区五通码头","type":"抗战遗址","year":"1938","people":"厦门守军","protect":"市级文物保护单位","edu":"区级爱国主义教育基地","status":"遗址尚存，周边环境已变化","blurb":"五通灯塔一带是1938年5月日军登陆厦门的主要地点之一，中国守军在此进行了顽强抵抗，书写了厦门抗战史上的悲壮一页。","photo_now":"wutong-now.jpg","photo_hist":"wutong-hist.jpg","timeline":"1938年5月10日｜日军在五通登陆｜守军浴血抵抗｜5月13日｜厦门沦陷｜1945年｜光复"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[119.6588,29.0872]},"properties":{"name":"金华台湾医院旧址","level":"C","address":"浙江省金华市婺城区","type":"涉台遗址","year":"1939","people":"台湾义勇队医疗队","protect":"市级文物保护单位","edu":"未定级","status":"建筑已改建，仅存碑记","blurb":"台湾义勇队附设的台湾医院，由台籍医师主持，不仅为队员提供医疗服务，还积极为金华当地百姓义诊，是两岸同胞患难与共的生动体现。","photo_now":"taiwan-yiyuan-now.jpg","photo_hist":"taiwan-yiyuan-hist.jpg","timeline":"1939年｜台湾医院成立｜1942年｜浙赣战役中紧急救治伤员｜1943年｜随义勇队转移福建"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[118.049,24.606]},"properties":{"name":"集美兑山李友邦将军纪念馆","level":"C","address":"厦门市集美区后溪镇兑山村","type":"纪念场馆","year":"","people":"李友邦、陈云林","protect":"未定级","edu":"","status":"纪念馆已建成开放","blurb":"李友邦将军祖籍地为同安兑山（今集美兑山村），纪念馆展示李友邦将军事迹，陈云林题词。","photo_now":"xm08-a.jpg","photo_hist":"","timeline":"1906年｜李友邦出生于台北｜1939年｜在金华组建台湾义勇队｜1945年｜率队返台｜兑山纪念馆建成开放"}},{"type":"Feature","geometry":{"type":"Point","coordinates":[118.073,24.452]},"properties":{"name":"升平路50号台湾义勇队驻地旧址","level":"C","address":"厦门市思明区升平路50号（民立小学左侧斜对面）","type":"建筑旧址","year":"1945","people":"李友邦、台湾义勇队","protect":"未定级","edu":"","status":"建筑尚存，但无标识牌，现作为居民小区","blurb":"1945年抗战胜利后，李友邦率台湾义勇队返台前在厦门的驻地，红砖楼建筑，原貌犹在。","photo_now":"xm02-b.jpg","photo_hist":"","timeline":"1939年｜台湾义勇队在金华成立｜1945年｜抗战胜利，义勇队驻厦门升平路50号｜李友邦率队返回台湾"}}]};
+    // SITES_DATA 由 js/sites-data.js 提供，支持直接双击打开。
 
     // ==============================================
     //  加载遗址数据（内嵌数据，无需 fetch）
@@ -417,8 +736,31 @@
       // 第六章 功能一：渲染 marker
       renderHeritageMarkers(map, geojson, heritageLayer);
 
+      // 将相关散点串联为台湾义勇队抗战活动故事线
+      drawAntiWarStoryLine(geojson);
+
       // 绑定 marker ↔ 列表项 双向联动
       bindMarkerEvents(heritageLayer);
+
+      document.getElementById('city-filter').addEventListener('change', applyFilters);
+      document.getElementById('level-filter').addEventListener('change', applyFilters);
+      document.getElementById('site-search-input').addEventListener('input', updateSearchResults);
+      document.getElementById('site-search-input').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          var firstResult = document.querySelector('.site-search__result');
+          if (firstResult) firstResult.click();
+        } else if (event.key === 'Escape') {
+          document.getElementById('site-search-results')
+            .classList.remove('site-search__results--open');
+        }
+      });
+      document.addEventListener('click', function (event) {
+        if (!event.target.closest('.site-search')) {
+          document.getElementById('site-search-results')
+            .classList.remove('site-search__results--open');
+        }
+      });
+      applyFilters();
 
       // 自动缩放到所有点位
       var bounds = heritageLayer.getBounds();
