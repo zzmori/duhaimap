@@ -413,30 +413,33 @@
     // ==============================================
     var map = L.map('map').setView([26.5, 118.5], 8);
 
-    // ---- 底图：CartoDB Positron 极简浅色底图 ----
-    var positronLayer = L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    // ---- 底图：高德地图中文底图（国内网络可访问） ----
+    var amapLayer = L.tileLayer(
+      'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
       {
-        subdomains: 'abcd',
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: '1234',
+        maxZoom: 18,
+        attribution: '&copy; 高德地图',
       }
     );
 
-    // ---- 备用底图：OpenStreetMap ----
-    var osmLayer = L.tileLayer(
-      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    // ---- 国内备用底图：GeoQ 智图中文社区图 ----
+    var geoqLayer = L.tileLayer(
+      'https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}',
       {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> 贡献者',
+        maxZoom: 18,
+        attribution: '&copy; GeoQ 智图',
       }
     );
 
-    positronLayer.addTo(map);
-    positronLayer.on('tileerror', function () {
-      console.warn('CartoDB Positron 加载失败，自动切换到 OpenStreetMap 备用底图');
-      map.removeLayer(positronLayer);
-      osmLayer.addTo(map);
+    var hasSwitchedBasemap = false;
+    amapLayer.addTo(map);
+    amapLayer.on('tileerror', function () {
+      if (hasSwitchedBasemap) return;
+      hasSwitchedBasemap = true;
+      console.warn('高德底图加载失败，自动切换到 GeoQ 国内备用底图');
+      map.removeLayer(amapLayer);
+      geoqLayer.addTo(map);
     });
 
     // ==============================================
