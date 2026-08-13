@@ -12,10 +12,111 @@
 
 .leaflet-popup-content {
   margin: 0 !important;
-  min-width: 380px;
-  max-width: 420px;
   font-family: "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", "FangSong", Georgia, "Times New Roman", serif;
   line-height: 1.7;
+}
+
+/* 可缩放弹窗：Leaflet 容器以底部中心锚定，内容只在内部滚动。 */
+.heritage-popup .leaflet-popup-content-wrapper {
+  box-sizing: border-box;
+  width: 420px;
+  height: 520px;
+  min-width: 280px;
+  min-height: 220px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 96px);
+  position: relative;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.heritage-popup .leaflet-popup-content {
+  box-sizing: border-box;
+  width: 100% !important;
+  height: 100%;
+  min-width: 0;
+  max-width: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.heritage-popup .leaflet-popup-tip-container {
+  left: 50%;
+  margin-left: -20px;
+}
+
+.heritage-popup .leaflet-popup-close-button {
+  right: 12px !important;
+  top: 4px !important;
+  z-index: 40;
+  border-radius: 50%;
+  background: rgba(250, 246, 240, 0.94) !important;
+}
+
+.heritage-popup__resize-handle {
+  position: absolute;
+  z-index: 35;
+  touch-action: none;
+  user-select: none;
+}
+
+.heritage-popup__resize-handle--n { top: 0; left: 14px; right: 14px; height: 8px; cursor: ns-resize; }
+.heritage-popup__resize-handle--e { top: 14px; right: 0; bottom: 14px; width: 8px; cursor: ew-resize; }
+.heritage-popup__resize-handle--w { top: 14px; left: 0; bottom: 14px; width: 8px; cursor: ew-resize; }
+.heritage-popup__resize-handle--ne { top: 0; right: 0; width: 16px; height: 16px; cursor: nesw-resize; }
+.heritage-popup__resize-handle--nw { top: 0; left: 0; width: 16px; height: 16px; cursor: nwse-resize; }
+
+.heritage-popup.is-resizing,
+.heritage-popup.is-resizing * {
+  user-select: none !important;
+}
+
+.heritage-popup .heritage-card,
+.heritage-popup .heritage-card__header,
+.heritage-popup .heritage-card__body,
+.heritage-popup .heritage-card__fields,
+.heritage-popup .heritage-card__photos,
+.heritage-popup .heritage-card__timeline {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
+.heritage-popup .heritage-card {
+  min-height: 100%;
+}
+
+.heritage-popup .heritage-card__title,
+.heritage-popup .heritage-card__field-value,
+.heritage-popup .heritage-card__blurb,
+.heritage-popup .heritage-card__timeline-event {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
+@media (max-width: 340px) {
+  .heritage-popup .leaflet-popup-content-wrapper {
+    min-width: 220px;
+  }
+}
+
+@container (max-width: 330px) {
+  .heritage-popup .heritage-card__field {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .heritage-popup .heritage-card__field-label {
+    width: auto;
+    margin-bottom: 2px;
+  }
+
+  .heritage-popup .heritage-card__photos {
+    flex-direction: column;
+  }
 }
 
 /* --- 档案卡片主体 --- */

@@ -212,6 +212,119 @@ function escapeHTML(str) {
     .replace(/'/g, '&#39;');
 }
 
+/*
+ * 为 Leaflet Popup 增加以“底部中心”为固定锚点的五向缩放。
+ * Leaflet 的 _updatePosition() 会把容器 bottom-center 对准 marker；缩放时
+ * 只更新外框尺寸和 _containerWidth，不修改经纬度或 popup offset。
+ */
+function enableAnchoredPopupResize(popup) {
+  var popupElement = popup.getElement();
+  if (!popupElement || popupElement._heritageResizeReady) return;
+
+  var wrapper = popupElement.querySelector('.leaflet-popup-content-wrapper');
+  if (!wrapper) return;
+  popupElement._heritageResizeReady = true;
+
+  var directions = ['n', 'e', 'w', 'ne', 'nw'];
+  var drag = null;
+
+  L.DomEvent.disableClickPropagation(wrapper);
+  L.DomEvent.disableScrollPropagation(wrapper);
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function updateAnchor() {
+    if (!popup._map || !popup._container) return;
+    var width = Math.round(wrapper.offsetWidth);
+    popup._container.style.width = width + 'px';
+    popup._containerWidth = width;
+    popup._updatePosition();
+  }
+
+  function stopResize(event) {
+    if (!drag || (event && event.pointerId !== drag.pointerId)) return;
+    if (drag.handle.releasePointerCapture &&
+        drag.handle.hasPointerCapture &&
+        drag.handle.hasPointerCapture(drag.pointerId)) {
+      drag.handle.releasePointerCapture(drag.pointerId);
+    }
+    popupElement.classList.remove('is-resizing');
+    drag = null;
+  }
+
+  function resizePopup(event) {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    event.preventDefault();
+    event.stopPropagation();
+
+    var dx = event.clientX - drag.startX;
+    var dy = event.clientY - drag.startY;
+    var nextWidth = drag.startWidth;
+    var nextHeight = drag.startHeight;
+
+    // 中心固定：任一横向边缘移动 d，整体宽度改变 2d。
+    if (drag.direction.indexOf('e') !== -1) nextWidth += dx * 2;
+    if (drag.direction.indexOf('w') !== -1) nextWidth -= dx * 2;
+    // 底部固定：顶部向上移动时高度增加。
+    if (drag.direction.indexOf('n') !== -1) nextHeight -= dy;
+
+    nextWidth = clamp(nextWidth, drag.minWidth, drag.maxWidth);
+    nextHeight = clamp(nextHeight, drag.minHeight, drag.maxHeight);
+    wrapper.style.width = Math.round(nextWidth) + 'px';
+    wrapper.style.height = Math.round(nextHeight) + 'px';
+    updateAnchor();
+  }
+
+  directions.forEach(function (direction) {
+    var handle = document.createElement('span');
+    handle.className = 'heritage-popup__resize-handle heritage-popup__resize-handle--' + direction;
+    handle.dataset.direction = direction;
+    handle.setAttribute('aria-hidden', 'true');
+    wrapper.appendChild(handle);
+
+    handle.addEventListener('pointerdown', function (event) {
+      if (event.button !== 0) return;
+      event.preventDefault();
+      event.stopPropagation();
+      var viewportWidth = popup._map.getContainer().clientWidth;
+      var viewportHeight = popup._map.getContainer().clientHeight;
+      drag = {
+        pointerId: event.pointerId,
+        handle: handle,
+        direction: direction,
+        startX: event.clientX,
+        startY: event.clientY,
+        startWidth: wrapper.offsetWidth,
+        startHeight: wrapper.offsetHeight,
+        minWidth: viewportWidth <= 340 ? 220 : 280,
+        minHeight: 220,
+        maxWidth: Math.max(280, Math.min(900, viewportWidth - 48)),
+        maxHeight: Math.max(220, viewportHeight - 96),
+      };
+      popupElement.classList.add('is-resizing');
+      if (handle.setPointerCapture) handle.setPointerCapture(event.pointerId);
+    });
+    handle.addEventListener('pointermove', resizePopup);
+    handle.addEventListener('pointerup', stopResize);
+    handle.addEventListener('pointercancel', stopResize);
+  });
+
+  // Leaflet 负责跟随地理坐标；地图状态变化完成后用当前宽度刷新锚点缓存。
+  var mapSyncHandler = function () { requestAnimationFrame(updateAnchor); };
+  popup._map.on('zoomend moveend viewreset resize', mapSyncHandler);
+  popupElement._heritageResizeCleanup = function () {
+    popup._map.off('zoomend moveend viewreset resize', mapSyncHandler);
+    drag = null;
+    popupElement.classList.remove('is-resizing');
+    var handles = wrapper.querySelectorAll('.heritage-popup__resize-handle');
+    for (var i = 0; i < handles.length; i++) handles[i].remove();
+    popupElement._heritageResizeReady = false;
+  };
+  updateAnchor();
+}
+
 // ============================================================
 //  6. 核心函数 —— 第六章 功能一
 // ============================================================
@@ -262,9 +375,22 @@ function renderHeritageMarkers(map, geojson, layerGroup) {
 
     var cardHTML = buildCardHTML(props);
     marker.bindPopup(cardHTML, {
-      maxWidth: 440,
-      minWidth: 380,
+      maxWidth: 900,
+      minWidth: 280,
       className: 'heritage-popup',
+      autoPan: false,
+    });
+
+    marker.on('popupopen', function (event) {
+      enableAnchoredPopupResize(event.popup);
+    });
+
+    marker.on('popupclose', function (event) {
+      var element = event.popup.getElement();
+      if (element && element._heritageResizeCleanup) {
+        element._heritageResizeCleanup();
+        element._heritageResizeCleanup = null;
+      }
     });
 
     marker.addTo(group);
